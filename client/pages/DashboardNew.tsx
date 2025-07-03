@@ -57,7 +57,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import * as XLSX from "xlsx";
-import { RecentActivities } from "@/components/RecentActivities";
+import { RecentActivitiesEnhanced } from "@/components/RecentActivitiesEnhanced";
 
 // Real-time data refresh utility
 const triggerDashboardRefresh = () => {
@@ -767,7 +767,7 @@ export default function Dashboard() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <RecentActivities userId={user?.id} role={user?.role} />
+          <RecentActivitiesEnhanced userId={user?.id} role={user?.role} />
         </CardContent>
       </Card>
 

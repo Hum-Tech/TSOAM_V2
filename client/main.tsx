@@ -14,14 +14,14 @@ import Dashboard from "./pages/DashboardNew";
 import MemberManagement from "./pages/MemberManagement";
 import NewMembers from "./pages/NewMembers";
 import HR from "./pages/HR";
-import Finance from "./pages/Finance";
+import FinanceAdvanced from "./pages/FinanceAdvanced";
 import Messaging from "./pages/Messaging";
 import Appointments from "./pages/Appointments";
 import Events from "./pages/Events";
 import Settings from "./pages/Settings";
 import SystemLogs from "./pages/SystemLogs";
 import Users from "./pages/Users";
-import Welfare from "./pages/Welfare";
+import WelfareEnhanced from "./pages/WelfareEnhanced";
 import Inventory from "./pages/Inventory";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
@@ -73,7 +73,7 @@ const App = () => (
               path="/finance"
               element={
                 <ProtectedRoute allowedRoles={["Admin", "Finance Officer"]}>
-                  <Finance />
+                  <FinanceAdvanced />
                 </ProtectedRoute>
               }
             />
@@ -103,7 +103,7 @@ const App = () => (
                     "User",
                   ]}
                 >
-                  <Welfare />
+                  <WelfareEnhanced />
                 </ProtectedRoute>
               }
             />

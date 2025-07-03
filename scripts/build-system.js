@@ -1,95 +1,76 @@
 #!/usr/bin/env node
 
-// TSOAM Church Management System - Build System Script
 const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process");
 
-async function buildSystem() {
-  console.log("🏢 TSOAM Church Management System");
-  console.log("🔨 Building complete system...");
-  console.log("=".repeat(50));
+console.log("🏢 TSOAM Church Management System");
+console.log("🔨 Building complete system...");
+console.log("==================================================");
 
+const rootDir = path.join(__dirname, "..");
+const clientDir = path.join(rootDir, "client");
+const serverDir = path.join(rootDir, "server");
+
+// Helper function to run commands safely
+function runCommand(command, workingDir = rootDir, description = "") {
   try {
-    // Check if client directory exists
-    const clientPath = path.join(__dirname, "..", "client");
-    if (!fs.existsSync(clientPath)) {
-      console.log(
-        "⚠️  Client directory not found, creating minimal structure...",
-      );
-      createMinimalClient();
+    if (description) {
+      console.log(`🔄 ${description}...`);
     }
 
-    // Install dependencies
-    console.log("🔄 Installing server dependencies...");
-    execSync("npm install", {
-      stdio: "inherit",
-      cwd: path.join(__dirname, ".."),
-    });
+    process.chdir(workingDir);
+    execSync(command, { stdio: "inherit" });
 
-    // Check if client has dependencies
-    const clientPackageJson = path.join(clientPath, "package.json");
-    if (fs.existsSync(clientPackageJson)) {
-      console.log("🔄 Installing client dependencies...");
-      execSync("npm install", { stdio: "inherit", cwd: clientPath });
-
-      console.log("🔄 Building client application...");
-      execSync("npm run build", { stdio: "inherit", cwd: clientPath });
+    if (description) {
+      console.log(`✅ ${description} completed`);
     }
-
-    // Test database connection
-    console.log("🔄 Testing database configuration...");
-    try {
-      execSync("node scripts/test-connection.js", {
-        stdio: "inherit",
-        cwd: path.join(__dirname, ".."),
-      });
-    } catch (error) {
-      console.log(
-        "⚠️  Database connection test failed - please configure MySQL",
-      );
-    }
-
-    console.log("");
-    console.log("✅ Build completed successfully!");
-    console.log("🚀 System is ready for deployment");
-    console.log("");
-    console.log("📋 Next steps:");
-    console.log("1. Configure MySQL database");
-    console.log("2. Update .env file with your settings");
-    console.log("3. Run: npm run init-db");
-    console.log("4. Start: npm start");
   } catch (error) {
-    console.error("❌ Build failed:", error.message);
+    console.error(`❌ ${description || "Command"} failed:`, error.message);
     process.exit(1);
   }
 }
 
-function createMinimalClient() {
-  const clientPath = path.join(__dirname, "..", "client");
+// Step 1: Install server dependencies
+runCommand("npm install", rootDir, "Installing server dependencies");
 
-  // Create client directory structure
-  if (!fs.existsSync(clientPath)) {
-    fs.mkdirSync(clientPath, { recursive: true });
+// Step 2: Install client dependencies
+runCommand("npm install", clientDir, "Installing client dependencies");
+
+// Step 3: Fix any dependency issues
+console.log("🔧 Fixing dependency resolution issues...");
+try {
+  process.chdir(clientDir);
+
+  // Remove problematic dependencies and reinstall
+  if (fs.existsSync(path.join(clientDir, "node_modules"))) {
+    console.log("   • Cleaning node_modules...");
+    fs.rmSync(path.join(clientDir, "node_modules"), {
+      recursive: true,
+      force: true,
+    });
   }
 
-  // Create basic package.json if it doesn't exist
-  const packageJsonPath = path.join(clientPath, "package.json");
-  if (!fs.existsSync(packageJsonPath)) {
-    const packageJson = {
-      name: "tsoam-church-client",
-      version: "2.0.0",
-      scripts: {
-        build: 'echo "No client build needed - using static files"',
-      },
-    };
-    fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+  if (fs.existsSync(path.join(clientDir, "package-lock.json"))) {
+    console.log("   • Cleaning package-lock.json...");
+    fs.unlinkSync(path.join(clientDir, "package-lock.json"));
   }
+
+  console.log("   • Reinstalling dependencies...");
+  execSync("npm install", { stdio: "inherit" });
+
+  console.log("✅ Dependencies fixed");
+} catch (error) {
+  console.error("❌ Failed to fix dependencies:", error.message);
+  process.exit(1);
 }
 
-// Run build if called directly
-if (require.main === module) {
-  buildSystem();
-}
+// Step 4: Build client application
+runCommand("npm run build-only", clientDir, "Building client application");
 
-module.exports = { buildSystem };
+console.log("==================================================");
+console.log("🎉 System build completed successfully!");
+console.log("");
+console.log("📁 Build output: client/dist");
+console.log("🚀 Ready for deployment");
+console.log("==================================================");

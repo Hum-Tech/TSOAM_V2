@@ -1,76 +1,52 @@
 {
   "name": "tsoam-church-management-system",
-  "version": "2.0.0",
-  "description": "TSOAM Church International Management System - Complete church administration solution with MySQL integration",
-  "main": "server.js",
+  "version": "1.0.0",
+  "description": "Complete Church Management System for The Seed of Abraham Ministry (TSOAM)",
+  "main": "server/server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "npm run dev:client",
-    "dev:client": "cd client && npm run dev",
+    "setup": "node setup.js",
+    "install-all": "npm install && cd client && npm install && cd ../server && npm install",
     "build": "node scripts/build-system.js",
-    "build:client": "cd client && npm run build",
-    "copy-client": "cp -r client/dist/* public/ 2>/dev/null || echo 'No client dist to copy'",
-    "serve": "npm run build && npm start",
-    "setup": "node install.js",
-    "init-db": "node scripts/init-database.js",
-    "backup": "node scripts/backup-data.js",
-    "restore": "node scripts/restore-data.js",
-    "test-connection": "node scripts/test-connection.js",
-    "clean-demo": "node scripts/clean-demo.js",
-    "mysql-setup": "node scripts/mysql-setup.js",
-    "create-archive": "node create-archive.js",
-    "postinstall": "echo 'TSOAM Church Management System dependencies installed. Run npm run init-db to initialize database.'"
-  },
-  "dependencies": {
-    "archiver": "^6.0.1",
-    "bcryptjs": "^2.4.3",
-    "compression": "^1.7.4",
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2",
-    "helmet": "^7.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "multer": "^1.4.5-lts.1",
-    "mysql2": "^3.6.5",
-    "node-cron": "^3.0.3",
-    "xlsx": "^0.18.5"
-  },
-  "devDependencies": {
-    "nodemon": "^3.0.2",
-    "typescript": "^5.8.3"
+    "build:client": "cd client && npm install && npm run build-only",
+    "build-production": "node scripts/build-optimize.js",
+    "start": "cd server && npm start",
+    "dev": "concurrently \"cd client && npm run dev\" \"cd server && npm run dev\"",
+    "dev-server": "cd server && npm run dev",
+    "dev-client": "cd client && npm run dev",
+    "create-db": "mysql -u root -p -e \"CREATE DATABASE IF NOT EXISTS tsoam_church_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci\"",
+    "import-schema": "mysql -u root -p tsoam_church_db < database/schema.sql",
+    "backup-db": "mysqldump -u root -p tsoam_church_db > backups/tsoam_backup_$(date +%Y%m%d_%H%M%S).sql",
+    "test-connection": "cd server && node -e \"require('./config/database').testConnection()\"",
+    "production": "npm run build-production",
+    "reset-db": "mysql -u root -p -e \"DROP DATABASE IF EXISTS tsoam_church_db; CREATE DATABASE tsoam_church_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci\" && npm run import-schema",
+    "clean": "rm -rf client/dist server/uploads/* logs/* node_modules/*/node_modules",
+    "health-check": "curl -f http://localhost:3001/api/health || exit 1"
   },
   "keywords": [
     "church",
     "management",
     "system",
     "tsoam",
-    "finance",
-    "hr",
     "members",
+    "finance",
     "inventory",
-    "welfare",
-    "mysql",
-    "network",
-    "backup"
+    "hr",
+    "welfare"
   ],
-  "author": "TSOAM Church International",
+  "author": "TSOAM Development Team",
   "license": "MIT",
-  "engines": {
-    "node": ">=16.0.0",
-    "npm": ">=8.0.0"
-  },
-  "os": [
-    "win32",
-    "darwin",
-    "linux"
-  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/tsoam/church-management-system.git"
   },
-  "bugs": {
-    "url": "https://github.com/tsoam/church-management-system/issues",
-    "email": "admin@tsoam.com"
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
   },
-  "homepage": "https://tsoam.com"
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1"
+  }
 }

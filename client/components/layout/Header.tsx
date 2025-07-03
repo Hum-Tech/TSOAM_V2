@@ -535,13 +535,19 @@ export function Header() {
                 <User className="mr-2 h-4 w-4" />
                 <span>Profile</span>
               </DropdownMenuItem>
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => navigate("/settings")}
-              >
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
-              </DropdownMenuItem>
+              {/* Only show Settings for Finance Officer and other authorized roles */}
+              {(user.role === "Finance Officer" ||
+                user.role === "Admin" ||
+                user.role === "HR Officer" ||
+                user?.permissions?.settings) && (
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => navigate("/settings")}
+                >
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Settings</span>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="cursor-pointer text-red-600 hover:text-red-700 hover:bg-red-50"

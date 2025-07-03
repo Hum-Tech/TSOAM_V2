@@ -2,17 +2,32 @@
   command = "cd client && npm ci && npm run build-only"
   functions = "netlify/functions"
   publish = "client/dist"
-
+  
 [build.environment]
   NODE_VERSION = "18"
   NPM_FLAGS = "--production=false"
 
-[functions]
-  external_node_modules = ["express"]
-  node_bundler = "esbuild"
+[context.production]
+  command = "cd client && npm ci && npm run build-only"
+
+[context.deploy-preview]
+  command = "cd client && npm ci && npm run build-only"
+
+[context.branch-deploy]
+  command = "cd client && npm ci && npm run build-only"
 
 [[headers]]
   for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.css"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 

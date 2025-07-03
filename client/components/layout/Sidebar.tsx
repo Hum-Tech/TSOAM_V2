@@ -84,9 +84,29 @@ export function Sidebar() {
   const location = useLocation();
   const { user, logout } = useAuth();
 
-  // Filter menu items based on user permissions
+  // Define allowed modules for Finance Officer role
+  const financeAllowedModules = [
+    "dashboard",
+    "finance",
+    "inventory",
+    "messaging",
+    "events",
+    "settings",
+  ];
+
+  // Filter menu items based on user permissions and role
   const menuItems = allMenuItems.filter((item) => {
     if (!user?.permissions) return false;
+
+    // For Finance Officer, only show specific modules
+    if (user.role === "Finance Officer") {
+      return (
+        financeAllowedModules.includes(item.permission) &&
+        user.permissions[item.permission as keyof typeof user.permissions]
+      );
+    }
+
+    // For other roles, use standard permission filtering
     return user.permissions[item.permission as keyof typeof user.permissions];
   });
 
