@@ -8,7 +8,7 @@
   NPM_FLAGS = "--production=false"
 
 [functions]
-  external_node_modules = ["express"]
+  external_node_modules = ["express", "serverless-http"]
   node_bundler = "esbuild"
 
 [[headers]]
